@@ -73,7 +73,9 @@ var formatError = function(error) {
 
 var BrowserStackBrowser = function(id, emitter, args, logger,
                                    /* config */ config,
-                                   /* browserStackTunnel */ tunnel, /* browserStackClient */ client) {
+                                   /* browserStackTunnel */ tunnel,
+                                   /* browserStackClient */ client,
+                                   socketServer) {
 
   var self = this;
   var workerId = null;
@@ -126,6 +128,18 @@ var BrowserStackBrowser = function(id, emitter, args, logger,
 
         var whenRunning = function() {
           log.debug('%s job started with id %s', browserName, workerId);
+
+          socketServer.sockets.on('connection', function(socket) {
+            socket.on('info', function(data) {
+              if (workerId && ('screenshot' in data) && data.screenshot === id) {
+                client.takeScreenshot(workerId, function (err, shot) {
+                  if (!err) {
+                    log.info('SCREENSHOT %s on %s: %s', data.step, browserName, shot.url);
+                  }
+                });
+              }
+            });
+          });
 
           if (captureTimeout) {
             captureTimeoutId = setTimeout(self._onTimeout, captureTimeout);
