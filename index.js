@@ -107,6 +107,7 @@ var BrowserStackBrowser = function(id, emitter, args, logger,
       url: url + '?id=' + id,
       'browserstack.tunnel': true,
       timeout: bsConfig.timeout || 300,
+      resolution: bsConfig.resolution || '1024x768',
       project: bsConfig.project,
       name: bsConfig.name || 'Karma test',
       build: bsConfig.build || process.env.TRAVIS_BUILD_NUMBER || process.env.BUILD_NUMBER ||
